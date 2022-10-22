@@ -282,11 +282,13 @@ int main(int argc, char **argv) {
         std::cout << energy(state) << std::endl;
         for (int i = 0; i < n; ++i) {
             advance(state, 0.01);
+            //output
+            for(int i=0;i<5;i++){
+                fs<<state[i].printWKT()<<endl;
+            }
         }
         std::cout << energy(state) << std::endl;
-        for(int i=0;i<5;i++){
-            fs<<state[i].printWKT()<<endl;
-        }
+
         fs.close();
         auto end=clock();
         cout<<"runtime is "<<end-start<<"us"<<endl;
