@@ -14,28 +14,34 @@
 #define _USE_MATH_DEFINES // https://docs.microsoft.com/en-us/cpp/c-runtime-library/math-constants?view=msvc-160
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
+
+using namespace std;
 
 // these values are constant and not allowed to be changed
 const double SOLAR_MASS = 4 * M_PI * M_PI;
 const double DAYS_PER_YEAR = 365.24;
 const unsigned int BODIES_COUNT = 5;
 
-
+//Smart choice by not using vector<vector>
 class vector3d {
 public:
     double x, y, z;
 
+    //vector length
     double norm() const noexcept {
         return x * x + y * y + z * z;
     }
 
+    //const=t/s^(3/2)
     double magnitude(double dt) const noexcept {
         double sum = norm();
         return dt / (sum * sqrt(sum));
     }
 };
 
+//function change the meaning of operators
 vector3d operator+(vector3d v1, vector3d v2) {
     return vector3d{
             v1.x + v2.x, v1.y + v2.y, v1.z + v2.z
@@ -91,9 +97,21 @@ public:
     vector3d position;
     vector3d velocity;
     double mass;
+
+    //return "name;x;y;z"
+    string printWKT(){
+        string temp,temp1,temp2,temp3,temp4,temp5;
+        temp1=";";
+        temp2= to_string(position.x);
+        temp3= to_string(position.y);
+        temp4= to_string(position.z);
+        temp=name+temp1+temp2+temp1+temp3+temp1+temp4;
+        return temp;
+
+    }
 };
 
-
+//BODIES_COUNT==5 USING 5 OBJECTS
 void advance(body state[BODIES_COUNT], double dt) {
     /*
      * We precompute the quantity (r_i - r_j)
@@ -108,7 +126,7 @@ void advance(body state[BODIES_COUNT], double dt) {
     }
 
     double magnitudes[BODIES_COUNT][BODIES_COUNT];
-
+    //iteration begins from i[0][1] why?: 01 02 03 04 05 11 12 13 14 15...
     for (unsigned int i = 0; i < BODIES_COUNT; ++i) {
         for (unsigned int j = i + 1; j < BODIES_COUNT; ++j) {
             magnitudes[i][j] = rij[i][j].magnitude(dt);
@@ -135,10 +153,11 @@ void advance(body state[BODIES_COUNT], double dt) {
         state[i].position += state[i].velocity * dt;
     }
 }
-
+//偏移量_动量
 void offset_momentum(body state[BODIES_COUNT]) {
+    //pay attention to &
     vector3d &sun_velocity = state[0].velocity;
-
+    //so strange! object 0-1-2-3-4-5 v*m/c
     for (unsigned int i = 1; i < BODIES_COUNT; ++i) {
         sun_velocity -= state[i].velocity * state[i].mass / SOLAR_MASS;
     }
@@ -245,14 +264,32 @@ int main(int argc, char **argv) {
         std::cout << "Call this program with an integer as program argument" << std::endl;
         std::cout << "(to set the number of iterations for the n-body simulation)." << std::endl;
         return EXIT_FAILURE;
-    } else {
+    }
+    else {
+        auto start=clock();
+        fstream fs;
+        //fs.open("test.csv", ios::trunc);
+        fs.open("test.csv");
+        if (!fs.is_open()) {
+            cout << "fial" << endl;
+            return 0;
+        }
+        fs<<"name;position x;position y; position z;"<<endl;
+        //atoi()代表的是ascii to integer，即“把字符串转换成有符号数字”
         const unsigned int n = atoi(argv[1]);
+        cout<<"iteration time equals"<<n<<endl;
         offset_momentum(state);
         std::cout << energy(state) << std::endl;
         for (int i = 0; i < n; ++i) {
             advance(state, 0.01);
         }
         std::cout << energy(state) << std::endl;
+        for(int i=0;i<5;i++){
+            fs<<state[i].printWKT()<<endl;
+        }
+        fs.close();
+        auto end=clock();
+        cout<<"runtime is "<<end-start<<"us"<<endl;
         return EXIT_SUCCESS;
     }
 }
