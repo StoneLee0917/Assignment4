@@ -11,12 +11,16 @@
 
 import sys
 from math import sqrt, pi as PI
+import pandas as pd
+import datetime
+
+
 
 
 def combinations(l):
     result = []
     for x in range(len(l) - 1):
-        ls = l[x + 1 :]
+        ls = l[x + 1:]
         for y in ls:
             result.append((l[x][0], l[x][1], l[x][2], y[0], y[1], y[2]))
     return result
@@ -121,8 +125,12 @@ def main(n, ref="sun"):
 
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     if len(sys.argv) >= 2:
         main(int(sys.argv[1]))
+        end_time = datetime.datetime.now()
+        py_time = end_time - start_time
+        print(py_time)
         sys.exit(0)
     else:
         print(f"This is {sys.argv[0]}")
