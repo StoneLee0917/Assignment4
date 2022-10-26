@@ -13,7 +13,7 @@ import sys
 from math import sqrt, pi as PI
 import pandas as pd
 import datetime
-
+# for recording time
 
 
 
@@ -73,7 +73,13 @@ SYSTEM = tuple(BODIES.values())
 PAIRS = tuple(combinations(SYSTEM))
 
 
-def advance(dt, n, bodies=SYSTEM, pairs=PAIRS):
+def advance(dt, n, filename, bodies=SYSTEM, pairs=PAIRS):
+    f = open(filename, "a")
+    f.write("name of the body;position x;position y;position z\n")
+    sun = SOLAR_MASS
+    jupiter = 9.54791938424326609e-04 * SOLAR_MASS
+    saturn = 2.85885980666130812e-04 * SOLAR_MASS
+    uranus = 4.36624404335156298e-05 * SOLAR_MASS
     for i in range(n):
         for ([x1, y1, z1], v1, m1, [x2, y2, z2], v2, m2) in pairs:
             dx = x1 - x2
@@ -89,11 +95,25 @@ def advance(dt, n, bodies=SYSTEM, pairs=PAIRS):
             v2[2] += dz * b1m
             v2[1] += dy * b1m
             v2[0] += dx * b1m
+
         for (r, [vx, vy, vz], m) in bodies:
             r[0] += dt * vx
             r[1] += dt * vy
             r[2] += dt * vz
-
+            x = str(r[0])
+            y = str(r[1])
+            z = str(r[2])
+            if m == sun:
+                f.write("sun;" + x + ";" + y + ";" + z + "\n")
+            elif m == jupiter:
+                f.write("jupiter;" + x + ";" + y + ";" + z + "\n")
+            elif m == saturn:
+                f.write("saturn;" + x + ";" + y + ";" + z + "\n")
+            elif m == uranus:
+                f.write("uranus;" + x + ";" + y + ";" + z + "\n")
+            else:
+                f.write("neptune;" + x + ";" + y + ";" + z + "\n")
+    f.close()
 
 def report_energy(bodies=SYSTEM, pairs=PAIRS, e=0.0):
     for ((x1, y1, z1), v1, m1, (x2, y2, z2), v2, m2) in pairs:
@@ -120,7 +140,7 @@ def offset_momentum(ref, bodies=SYSTEM, px=0.0, py=0.0, pz=0.0):
 def main(n, ref="sun"):
     offset_momentum(BODIES[ref])
     report_energy()
-    advance(0.01, n)
+    advance(0.01, n, "result.csv")
     report_energy()
 
 
