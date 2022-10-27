@@ -163,6 +163,7 @@ void offset_momentum(body state[BODIES_COUNT]) {
     }
 }
 
+//E=M*C^2
 double energy(const body state[BODIES_COUNT]) {
     double energy = 0;
 
