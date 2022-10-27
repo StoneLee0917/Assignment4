@@ -11,12 +11,16 @@
 
 import sys
 from math import sqrt, pi as PI
+import pandas as pd
+import datetime
+# for recording time
+
 
 
 def combinations(l):
     result = []
     for x in range(len(l) - 1):
-        ls = l[x + 1 :]
+        ls = l[x + 1:]
         for y in ls:
             result.append((l[x][0], l[x][1], l[x][2], y[0], y[1], y[2]))
     return result
@@ -69,7 +73,13 @@ SYSTEM = tuple(BODIES.values())
 PAIRS = tuple(combinations(SYSTEM))
 
 
-def advance(dt, n, bodies=SYSTEM, pairs=PAIRS):
+def advance(dt, n, filename, bodies=SYSTEM, pairs=PAIRS):
+    f = open(filename, "a")
+    f.write("name of the body;position x;position y;position z\n")
+    sun = SOLAR_MASS
+    jupiter = 9.54791938424326609e-04 * SOLAR_MASS
+    saturn = 2.85885980666130812e-04 * SOLAR_MASS
+    uranus = 4.36624404335156298e-05 * SOLAR_MASS
     for i in range(n):
         for ([x1, y1, z1], v1, m1, [x2, y2, z2], v2, m2) in pairs:
             dx = x1 - x2
@@ -85,10 +95,14 @@ def advance(dt, n, bodies=SYSTEM, pairs=PAIRS):
             v2[2] += dz * b1m
             v2[1] += dy * b1m
             v2[0] += dx * b1m
+
         for (r, [vx, vy, vz], m) in bodies:
             r[0] += dt * vx
             r[1] += dt * vy
             r[2] += dt * vz
+            x = str(r[0])
+            y = str(r[1])
+            z = str(r[2])
 
 
 def report_energy(bodies=SYSTEM, pairs=PAIRS, e=0.0):
@@ -116,13 +130,17 @@ def offset_momentum(ref, bodies=SYSTEM, px=0.0, py=0.0, pz=0.0):
 def main(n, ref="sun"):
     offset_momentum(BODIES[ref])
     report_energy()
-    advance(0.01, n)
+    advance(0.01, n, "result_50000000.csv")
     report_energy()
 
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     if len(sys.argv) >= 2:
         main(int(sys.argv[1]))
+        end_time = datetime.datetime.now()
+        py_time = end_time - start_time
+        print(py_time)
         sys.exit(0)
     else:
         print(f"This is {sys.argv[0]}")
