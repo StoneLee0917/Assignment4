@@ -103,7 +103,17 @@ def advance(dt, n, filename, bodies=SYSTEM, pairs=PAIRS):
             x = str(r[0])
             y = str(r[1])
             z = str(r[2])
-
+            if m == sun:
+                f.write("sun;" + x + ";" + y + ";" + z + "\n")
+            elif m == jupiter:
+                f.write("jupiter;" + x + ";" + y + ";" + z + "\n")
+            elif m == saturn:
+                f.write("saturn;" + x + ";" + y + ";" + z + "\n")
+            elif m == uranus:
+                f.write("uranus;" + x + ";" + y + ";" + z + "\n")
+            else:
+                f.write("neptune;" + x + ";" + y + ";" + z + "\n")
+    f.close()
 
 def report_energy(bodies=SYSTEM, pairs=PAIRS, e=0.0):
     for ((x1, y1, z1), v1, m1, (x2, y2, z2), v2, m2) in pairs:
