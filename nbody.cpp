@@ -99,16 +99,8 @@ public:
     double mass;
 
     //return "name;x;y;z"
-    string printWKT(){
-        string temp,temp1,temp2,temp3,temp4,temp5;
-        temp1=";";
-        temp2= to_string(position.x);
-        temp3= to_string(position.y);
-        temp4= to_string(position.z);
-        temp=name+temp1+temp2+temp1+temp3+temp1+temp4;
-        return temp;
 
-    }
+
 };
 
 //BODIES_COUNT==5 USING 5 OBJECTS
@@ -260,6 +252,7 @@ body state[] = {
 
 
 int main(int argc, char **argv) {
+    clock_t start=clock();
     if (argc != 2) {
         std::cout << "This is " << argv[0] << std::endl;
         std::cout << "Call this program with an integer as program argument" << std::endl;
@@ -267,7 +260,6 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     else {
-        auto start=clock();
         fstream fs;
         //fs.open("test.csv", ios::trunc);
         fs.open("test.csv");
@@ -285,14 +277,17 @@ int main(int argc, char **argv) {
             advance(state, 0.01);
             //output
             for(int i=0;i<5;i++){
-                fs<<state[i].printWKT()<<endl;
+                fs<<state[i].name<<';'<<state[i].position.x<<";"<<state[i].position.y<<";"<<state[i].position.z<<";"<<endl;
             }
         }
         std::cout << energy(state) << std::endl;
 
         fs.close();
         auto end=clock();
-        cout<<"runtime is "<<end-start<<"us"<<endl;
+        //cout<<"runtime is "<<end-start<<"us"<<endl;
+        printf("clock time:%ld tic \n",end-start);
+        printf("clock time %f ms \n",(double)end-start/1000);
+        printf("clock time: %f s\n",(double)(end-start)/CLOCKS_PER_SEC);
         return EXIT_SUCCESS;
     }
 }
